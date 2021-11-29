@@ -8,8 +8,8 @@
 
     <TextView
         android:id="@+id/serialTextView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
         android:background="#E91E63"
         android:textColor="@color/white"
@@ -18,24 +18,23 @@
         android:textAlignment="center"
         android:textSize="200sp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/timerTextView"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/timerTextView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
         android:background="#E91E63"
         android:textColor="@color/white"
         android:gravity="center"
         android:text="00"
-
         android:textAlignment="center"
         android:textSize="200sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="@id/serialTextView"
-        app:layout_constraintRight_toRightOf="@id/serialTextView"
-        app:layout_constraintTop_toBottomOf="@id/serialTextView" />
+        app:layout_constraintLeft_toRightOf="@id/serialTextView"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

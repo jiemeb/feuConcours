@@ -12,7 +12,6 @@ import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     // Maximumn sound stream.
@@ -52,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         timerTextView = findViewById(R.id.timerTextView);
-        serieTextView = findViewById(R.id.serieTextView);
+        serieTextView = findViewById(R.id.serialTextView);
         timerTextView.setOnTouchListener(startStop);
 
         // sound gestion
@@ -162,11 +161,12 @@ public class MainActivity extends AppCompatActivity {
                     int seconds = (int) (targetTime / 1000 + ((targetTime % 1000 ==0) ? 0 : 1));
                     seconds += offsetTime [step];
                     int minutes = seconds / 60;
+                    int timeSeconds= seconds ;
                     seconds = seconds % 60;
 
 
-                    timerTextView.setText(String.format("%d:%02d", minutes, seconds));
-         //           timerTextView.setText(String.format("%d", millis));
+         //           timerTextView.setText(String.format("%d:%02d", minutes, seconds));
+                    timerTextView.setText(String.format("%d", timeSeconds));
                     timerTextView.setBackgroundColor(colorFeu[step]);
                     serieTextView.setBackgroundColor(colorFeu[step]);
                     if(sequence)
@@ -195,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             else {
-                timerTextView.setText("0:00");
+                timerTextView.setText("00");
                 targetTime = 0 ;
             }
         }
