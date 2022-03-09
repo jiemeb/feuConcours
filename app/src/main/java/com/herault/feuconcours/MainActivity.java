@@ -109,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
                     live = true;
                     startTime =  System.currentTimeMillis();
                     klaxonOn = true ;
+                    v.setKeepScreenOn(true);
                     timerHandler.postDelayed(timerRunnable, 1000);
                 } else {
                     step = 0;
@@ -118,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
                         sequence = false;
                     else
                         sequence = true ;
+                    v.setKeepScreenOn(false);
                     timerHandler.removeCallbacks(timerRunnable);
                 }
             }
@@ -139,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
                 if ((step+1) == sequenceAB.length) {
                     live = false;
                     timerHandler.removeCallbacks(timerRunnable);
+                    timerTextView.setKeepScreenOn(false);
                     targetTime = 0;
                     if(sequence )
                         sequence = false;
@@ -169,6 +172,17 @@ public class MainActivity extends AppCompatActivity {
                     timerTextView.setText(String.format("%d", timeSeconds));
                     timerTextView.setBackgroundColor(colorFeu[step]);
                     serieTextView.setBackgroundColor(colorFeu[step]);
+                    if (colorFeu[step]==  Color.YELLOW)
+                    {
+                        timerTextView.setTextColor(Color.BLACK);
+                        serieTextView.setTextColor(Color.BLACK);
+                    }
+                    else
+                    {
+                        timerTextView.setTextColor(Color.WHITE);
+                        serieTextView.setTextColor(Color.WHITE);
+                    }
+
                     if(sequence)
                         serieTextView.setText(sequenceCD[step]);
                     else
@@ -196,6 +210,8 @@ public class MainActivity extends AppCompatActivity {
             }
             else {
                 timerTextView.setText("00");
+
+
                 targetTime = 0 ;
             }
         }
