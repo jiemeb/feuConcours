@@ -1,38 +1,36 @@
 package com.herault.feuconcours;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.graphics.Color;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 public class MainActivity extends AppCompatActivity {
-    // Maximumn sound stream.
+    // Maximun sound stream.
     private static final int MAX_STREAMS = 5;
      SoundPool soundPool;
-    private boolean loaded;
-    private AudioManager audioManager;
-  // Stream type.
+    // Stream type.
     private static final int streamType = AudioManager.STREAM_MUSIC;
     private float volume;
 
-    private int soundIdklaxonn1 ;
-    private int soundIdklaxonn2 ;
-    private int soundIdklaxonn3 ;
+    private int soundIdKlaxon1;
+    private int soundIdKlaxon2;
+    private int soundIdKlaxon3;
 
-    int  colorFeu [] = new int [] { Color.RED,Color.RED, Color.GREEN, Color.YELLOW , Color.RED,Color.GREEN, Color.YELLOW , Color.RED };
-    String sequenceAB []= new String[] {"AB","AB", "AB", "AB" , "CD","CD","CD","CD"};
-    String sequenceCD []= new String[] {"CD","CD","CD","CD","AB", "AB", "AB" ,"AB" };
-    long waitingTime  [ ] = new long[]  {0,10, 90, 30 , 10, 90, 30 , 0};
-    int offsetTime [] = {0,0,30,0,0,30,0,0};
-    int klaxon [] = new int[]  {0,2, 1, 0 , 2,1,0,3};
+    int[] colorFeu = new int [] { Color.RED,Color.RED, Color.GREEN, Color.YELLOW , Color.RED,Color.GREEN, Color.YELLOW , Color.RED };
+    String[] sequenceAB = new String[] {"AB","AB", "AB", "AB" , "CD","CD","CD","CD"};
+    String [] sequenceCD = new String[] {"CD","CD","CD","CD","AB", "AB", "AB" ,"AB" };
+    long [] waitingTime   = new long[]  {0,10, 90, 30 , 10, 90, 30 , 0};
+    int [] offsetTime  = {0,0,30,0,0,30,0,0};
+    int []  klaxon = new int[]  {0,2, 1, 0 , 2,1,0,3};
 
     private boolean live = false ; // Timer status
     long targetTime = 0 ;
@@ -40,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     boolean sequence =false ;
     boolean klaxonOn ;
 
-    Handler timerHandler = new Handler();
+    Handler timerHandler = new Handler(Looper.getMainLooper());
 
     long startTime = 0;
     TextView timerTextView ;
@@ -57,15 +55,15 @@ public class MainActivity extends AppCompatActivity {
         // sound gestion
 
         // AudioManager audio settings for adjusting the volume
-        audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 
-        // Current volumn Index of particular stream type.
+        // Current volume Index of particular stream type.
         float currentVolumeIndex = (float) audioManager.getStreamVolume(streamType);
 
         // Get the maximum volume index for a particular stream type.
         float maxVolumeIndex  = (float) audioManager.getStreamMaxVolume(streamType);
 
-        // Volumn (0 --> 1)
+        // Volume (0 --> 1)
         this.volume = currentVolumeIndex / maxVolumeIndex;
 
         // Suggests an audio stream whose volume should be changed by
@@ -73,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         this.setVolumeControlStream(streamType);
 
 
-        if (Build.VERSION.SDK_INT >= 21 ) {
+
             AudioAttributes audioAttrib = new AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_GAME)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
@@ -83,18 +81,14 @@ public class MainActivity extends AppCompatActivity {
             builder.setAudioAttributes(audioAttrib).setMaxStreams(MAX_STREAMS);
 
             this.soundPool = builder.build();
-        }
+
         // When Sound Pool load complete.
-        this.soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
-            @Override
-            public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
-                loaded = true;
-            }
+        this.soundPool.setOnLoadCompleteListener((soundPool, sampleId, status) -> {
         });
-        // Load sound file (laxonn.mp3) into SoundPool.
-        this.soundIdklaxonn1 = this.soundPool.load(this, R.raw.klaxonn1,1);
-        this.soundIdklaxonn2 = this.soundPool.load(this, R.raw.klaxonn2,1);
-        this.soundIdklaxonn3 = this.soundPool.load(this, R.raw.klaxonn3,1);
+        // Load sound file (Klaxonn.mp3) into SoundPool.
+        this.soundIdKlaxon1 = this.soundPool.load(this, R.raw.klaxonn1,1);
+        this.soundIdKlaxon2 = this.soundPool.load(this, R.raw.klaxonn2,1);
+        this.soundIdKlaxon3 = this.soundPool.load(this, R.raw.klaxonn3,1);
 
     }
 
@@ -104,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
-                if (live == false) {
+                if (!live) {
                     step = 0;
                     live = true;
                     startTime =  System.currentTimeMillis();
@@ -115,10 +109,7 @@ public class MainActivity extends AppCompatActivity {
                     step = 0;
                     live = false;
                     klaxonOn = false ;
-                    if(sequence )
-                        sequence = false;
-                    else
-                        sequence = true ;
+                    sequence = !sequence;
                     v.setKeepScreenOn(false);
                     timerHandler.removeCallbacks(timerRunnable);
                 }
@@ -143,20 +134,17 @@ public class MainActivity extends AppCompatActivity {
                     timerHandler.removeCallbacks(timerRunnable);
                     timerTextView.setKeepScreenOn(false);
                     targetTime = 0;
-                    if(sequence )
-                        sequence = false;
-                    else
-                        sequence = true ;
+                    sequence = !sequence;
                 }
                 else
                 {
                     targetTime = waitingTime[step]*1000;  // target Time in millisecond
                     long millis = System.currentTimeMillis() - startTime;
                     targetTime -=  millis;                            // temps restant
-                    if (targetTime <= 000) {                                  // Init new step
+                    if (targetTime <= 0) {                                  // Init new step
 
                         startTime = System.currentTimeMillis();
-                        millis = System.currentTimeMillis() - startTime;
+ //                       millis = System.currentTimeMillis() - startTime;
                         step += 1;
                         klaxonOn = true;
                         targetTime = waitingTime[step]*1000;
@@ -192,13 +180,13 @@ public class MainActivity extends AppCompatActivity {
                             case 0:
                                 break;
                             case 1:
-                                int streamId = soundPool.play(soundIdklaxonn1, volume, volume, 1, 0, 1f);
+                                soundPool.play(soundIdKlaxon1, volume, volume, 1, 0, 1f);
                                 break;
                             case 2:
-                                streamId = soundPool.play(soundIdklaxonn2, volume, volume, 1, 0, 1f);
+                                 soundPool.play(soundIdKlaxon2, volume, volume, 1, 0, 1f);
                                 break;
                             case 3:
-                                streamId = soundPool.play(soundIdklaxonn3, volume, volume, 1, 0, 1f);
+                                  soundPool.play(soundIdKlaxon3, volume, volume, 1, 0, 1f);
                                 break;
 
                         }
