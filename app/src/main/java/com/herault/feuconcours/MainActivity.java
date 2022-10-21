@@ -1,10 +1,12 @@
 package com.herault.feuconcours;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.MotionEvent;
@@ -12,6 +14,12 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.io.File;
+import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
     // Maximun sound stream.
@@ -49,9 +57,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         timerTextView = findViewById(R.id.timerTextView);
-        serieTextView = findViewById(R.id.serialTextView);
         timerTextView.setOnTouchListener(startStop);
 
+        serieTextView = findViewById(R.id.serialTextView);
+        serieTextView.setOnTouchListener(nextStep);
+
+
+// Fin de test
         // sound gestion
 
         // AudioManager audio settings for adjusting the volume
@@ -92,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private final View.OnTouchListener startStop = new View.OnTouchListener() {
+    private final View.OnTouchListener  startStop  = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
 
@@ -106,18 +118,58 @@ public class MainActivity extends AppCompatActivity {
                     v.setKeepScreenOn(true);
                     timerHandler.postDelayed(timerRunnable, 1000);
                 } else {
-                    step = 0;
-                    live = false;
-                    klaxonOn = false ;
-                    sequence = !sequence;
-                    v.setKeepScreenOn(false);
-                    timerHandler.removeCallbacks(timerRunnable);
+                    if ((step + 1) > (sequenceAB.length / 2)) {
+                        step = 0;
+                        live = false;
+                        sequence = !sequence;
+                        v.setKeepScreenOn(false);
+                        timerHandler.removeCallbacks(timerRunnable);
+                        soundPool.play(soundIdKlaxon3, volume, volume, 1, 0, 1f);
+                        startTime =  System.currentTimeMillis();
+                        targetTime = waitingTime[step]*1000;
+
+                    }
+                    else
+                    {
+                        step = sequenceAB.length / 2 ;
+                        startTime =  System.currentTimeMillis();
+                        targetTime = waitingTime[step]*1000;
+                        soundPool.play(soundIdKlaxon2, volume, volume, 1, 0, 1f);
+
+
+                    }
                 }
-            }
+            } else
+            v.performClick();
 
             return true;
         }
 
+    };
+    private final View.OnTouchListener nextStep  = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+
+                if (!live) {
+                    step = 0;
+                    live = true;
+                    startTime =  System.currentTimeMillis();
+                    klaxonOn = true ;
+                    v.setKeepScreenOn(true);
+                    timerHandler.postDelayed(timerRunnable, 1000);
+                } else {                // Go to next Step
+                    step = 0;
+                    klaxonOn = true ;
+                    targetTime = 0;
+                    sequence = !sequence;
+                    timerHandler.postDelayed(timerRunnable, 1000);
+                }
+            }else
+                v.performClick();
+            return true;
+        }
     };
 
 
@@ -153,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
                     seconds += offsetTime [step];
                     int minutes = seconds / 60;
                     int timeSeconds= seconds ;
-                    seconds = seconds % 60;
+          //          seconds = seconds % 60;
 
 
          //           timerTextView.setText(String.format("%d:%02d", minutes, seconds));
@@ -204,6 +256,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
+
+
+
 
   @Override
     public void onPause() {
